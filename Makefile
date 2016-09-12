@@ -14,7 +14,6 @@ os-image : boot/boot_sect.bin kernel.bin
 
 kernel.bin: kernel/kernel_entry.o ${OBJ}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
-	ld -m elf_i386 -o wtf.bin -Ttext 0x1000 $^ 
 
 boot/boot_sect.bin: kernel.bin
 	chmod +x ./scripts/blocks.sh
