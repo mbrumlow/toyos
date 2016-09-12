@@ -1,6 +1,7 @@
 
 #include <kernel/screen.h>
 #include <kernel/port.h>
+#include <kernel/serial.h>
 
 # define VIDEO_ADDRESS 0xb8000
 # define MAX_ROWS 25
@@ -18,8 +19,8 @@ void set_cursor(int offset);
 int get_screen_offset(int col, int row);
 int handle_scrolling(int cursor_offset);
 
-
 void print_char(char character, int col, int row, char attribute_byte) {
+
 
 	unsigned char *video_memory = (unsigned char *) VIDEO_ADDRESS;
 
@@ -55,6 +56,9 @@ void print_at(char *message, int col, int row)  {
 
 	int i = 0;
 	while(message[i] != 0) {
+		if(col < 0 && row < 0) {
+			print_char_serial(message[i]);
+		}
 		print_char(message[i++], col, row, WHITE_ON_BLACK);
 	}
 }

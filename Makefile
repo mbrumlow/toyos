@@ -6,7 +6,7 @@ OBJ = ${C_SOURCES:.c=.o}
 all: os-image
 
 run: all
-	qemu-system-x86_64 os-image 
+	qemu-system-x86_64 -serial stdio os-image 
 
 os-image : boot/boot_sect.bin kernel.bin
 	cat $^ > os-image
