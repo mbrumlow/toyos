@@ -13,6 +13,8 @@ jmp $
 
 init_pd:
 
+  ; Target system only has ~6 megabytes of ram. For now we will have 8 megabytes
+  ; addressable vm.
 
   mov eax, 0x0
   mov ebx, page_table
@@ -31,6 +33,9 @@ init_pd:
     je .fill_pd_end
     jmp .fill_pd
   .fill_pd_end:
+
+
+  ; Identity map the first ~4MB for now.
 
   mov eax, 0x0
   mov ebx, 0x0
