@@ -1,8 +1,10 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
+// Default colour scheme attribute byte.
+# define WHITE_ON_BLACK 0x0f
+
 void clear_screen();
-void printk(char *message);
-void print_char(char character, int col, int row, char attribute_byte);
+void printk(char c);
 
 #endif // __SCREEN_H__

@@ -27,6 +27,7 @@ boot/boot_sect.bin: kernel.bin
 	nasm $< -f elf32 -o $@
 
 clean: 
+	rm -f *.bin_elf
 	rm -f *.bin *.dis *.o os-image
 	rm -f kernel/*.o boot/*.bin drivers/*.o
 

@@ -9,6 +9,10 @@ mov esp, stack_top                     ; Setup stack.
 
 call init_pd
 call main
+
+mov ebx, MSG_KERNEL_EXITED
+call print_string_pm
+
 jmp $
 
 init_pd:
@@ -63,6 +67,12 @@ init_pd:
   mov cr0, eax
 
   ret
+
+
+%include "boot/print_pm.asm"
+
+MSG_KERNEL_EXITED db "Kernel exited.",0
+
 
 section .bss
 align 4096

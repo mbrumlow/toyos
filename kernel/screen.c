@@ -1,14 +1,12 @@
 
 #include <kernel/screen.h>
+#include <kernel/string.h>
 #include <kernel/port.h>
 #include <kernel/serial.h>
 
 # define VIDEO_ADDRESS 0xb8000
 # define MAX_ROWS 25
 # define MAX_COLS 80
-
-// Default colour scheme attribute byte.
-# define WHITE_ON_BLACK 0x0f
 
 // Screen device I/O ports
 # define REG_SCREEN_CTRL 0x3D4
@@ -20,7 +18,6 @@ int get_screen_offset(int col, int row);
 int handle_scrolling(int cursor_offset);
 
 void print_char(char character, int col, int row, char attribute_byte) {
-
 
 	unsigned char *video_memory = (unsigned char *) VIDEO_ADDRESS;
 
@@ -63,8 +60,9 @@ void print_at(char *message, int col, int row)  {
 	}
 }
 
-void printk(char *message) {
-	print_at(message, -1, -1);
+void printk(char c) {
+	print_char_serial(c);
+	print_char(c, -1, -1, WHITE_ON_BLACK);
 }
 
 int get_cursor() {
@@ -88,13 +86,6 @@ void set_cursor(int offset) {
 	port_byte_out ( REG_SCREEN_DATA , ( unsigned char )offset);
 }
 
-void memory_copy(char *src, char *dst, int bytes)  {
-	for(int i = 0; i < bytes; i++) {
-		*(dst+i) = *(src+i);
-	}
-}
-
-
 int handle_scrolling( int cursor_offset) {
 
 	if(cursor_offset < MAX_ROWS*MAX_COLS*2) {
@@ -102,9 +93,9 @@ int handle_scrolling( int cursor_offset) {
 	}
 
 	for(int i = 1; i < MAX_ROWS; i++) {
-		memory_copy((char *)get_screen_offset(0, i) + VIDEO_ADDRESS,
-			    (char *)get_screen_offset(0, i-1) + VIDEO_ADDRESS,
-			    MAX_COLS*2) ;
+		memcpy((void *) get_screen_offset(0, i-1) + VIDEO_ADDRESS,
+				(void *) get_screen_offset(0, i) + VIDEO_ADDRESS,
+				MAX_COLS*2) ;
 	}
 
 	char *last_line = (char *)get_screen_offset(0, MAX_ROWS-1) + VIDEO_ADDRESS;

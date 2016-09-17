@@ -5,6 +5,7 @@ WHITE_ON_BLACK equ 0x0f
 
 print_string_pm:
   pusha
+  call print_clear_line
   mov edx, VIDEO_MEMORY
 
 print_string_pm_loop:
@@ -25,6 +26,20 @@ print_string_pm_done:
   popa
   ret
 
+print_clear_line:
 
+  mov edx, VIDEO_MEMORY
+  mov ecx, 0x0
+  .clear:
+  mov al, 0x0
+  mov ah, WHITE_ON_BLACK
+  mov [edx], ax
+  add edx, 2
+  inc ecx
+  cmp ecx, 80
+  je .clear_end
+  jmp .clear
+  .clear_end:
+  ret
 
 
