@@ -6,14 +6,15 @@ OBJ = ${C_SOURCES:.c=.o}
 all: os-image
 
 run: all
-	qemu-system-x86_64 -serial stdio os-image 
+	qemu-system-x86_64 -m size=6411K -serial stdio -cpu 486 os-image 
 
 os-image : boot/boot_sect.bin kernel.bin
 	cat $^ > os-image
 	truncate -s +512 os-image
 
 kernel.bin: kernel/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
+	ld -m elf_i386 -o $@_elf -T linker.ld  $^
 
 boot/boot_sect.bin: kernel.bin
 	chmod +x ./scripts/blocks.sh

@@ -4,8 +4,8 @@
 
 void main() {
 
-	clear_screen();
 	init_serial();
+	clear_screen();
 
 	printk("Hello, World!\n");
 }
