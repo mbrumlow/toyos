@@ -48,6 +48,7 @@ BEGIN_PM:
   mov ebx, MSG_PROT_MODE
   call print_string_pm
 
+  mov edx, KERNEL_OFFSET
   call KERNEL_OFFSET
 
   jmp $

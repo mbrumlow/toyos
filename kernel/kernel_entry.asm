@@ -8,6 +8,9 @@ extern main
 mov esp, stack_top                     ; Setup stack.
 
 call init_pd
+
+push kernel_end
+push edx
 call main
 
 mov ebx, MSG_KERNEL_EXITED
@@ -17,6 +20,7 @@ jmp $
 
 init_pd:
 
+  pusha
   ; Target system only has ~6 megabytes of ram. For now we will have 8 megabytes
   ; addressable vm.
 
@@ -66,6 +70,7 @@ init_pd:
   or eax, 0x80000000
   mov cr0, eax
 
+  popa
   ret
 
 
@@ -82,6 +87,6 @@ page_table:
  resb 4096
  resb 4096
 stac_bottom:
- resb 1024
+ resb 4096
 stack_top:
-
+kernel_end:
