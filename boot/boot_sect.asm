@@ -1,10 +1,10 @@
 [org 0x7c00]
 
-KERNEL_OFFSET equ 0x1000               ; Offset to load kernel from.
+KERNEL_OFFSET equ 0x2000               ; Offset to load kernel from.
 
   mov [BOOT_DRIVE], dl                 ; Sve boot drive from BIOS.
 
-  mov bp, 0x10000                      ; Setup the stack.
+  mov bp, 0x1000                       ; Setup the stack.
   mov sp, bp
 
   call init_screen                     ; Clear the screen an indicate we we

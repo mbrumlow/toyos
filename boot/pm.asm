@@ -18,7 +18,6 @@ switch_to_pm:
 [bits 32]
 
 ; Init registers and stack in PM
-
 init_pm:
 
   mov ax, DATA_SEG       ; In PM our old segments are meaningliss, so we have
@@ -28,13 +27,8 @@ init_pm:
   mov fs, ax
   mov gs, ax
 
-  mov ebp, 0x90000       ; Update our stack pointer so it is at the top of the
+  mov ebp, 0x1000       ; Update our stack pointer so it is at the top of the
   mov esp, ebp           ; free spaec.
 
   call BEGIN_PM
-
-
-
-
-
 

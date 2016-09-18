@@ -6,14 +6,15 @@
 
 #include <kernel/page.h>
 
-void main(void *kstart, void *kend, void *page_directory ) {
+void main(void *start, void *end, void *page_directory ) {
 
 	init_serial();
 	clear_screen();
 
-	kprintf("kstart: 0x%p, kend: 0x%p, pd: 0x%p\n", kstart, kend, page_directory);
+	kprintf("start: 0x%p, end: 0x%p\n", start, end);
 
-	init_paging(page_directory);
+
+//	init_paging(page_directory);
 
 	while(1);
 }
