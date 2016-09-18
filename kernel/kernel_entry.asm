@@ -9,6 +9,7 @@ mov esp, stack_top                     ; Setup stack.
 
 call init_pd
 
+push page_directory
 push kernel_end
 push edx
 call main

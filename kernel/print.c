@@ -87,7 +87,7 @@ void vkprintf(char *fmt, va_list args) {
 		precision = -1;
 
 		if( *fmt >= '0' && *fmt <= '9' )  {
-			width = vkprintf_atoi(&fmt);
+			width = vkprintf_atoi((const char **)&fmt);
 		}
 
 		char *s = str;
@@ -107,24 +107,28 @@ void vkprintf(char *fmt, va_list args) {
 				continue;
 			case 'o':
 				base = 8;
+				num = va_arg(args, int);
 				break;
 			case 'p':
 				base = 16;
 				width = 2 * sizeof(void *) ;
 				flags |= ZEROPAD;
+				num = (unsigned int) va_arg(args, void *);
+				break;
 			case 'X':
 				// TODO implement topper.
 			case 'x':
 				base = 16;
+				num = va_arg(args, int);
 				break;
 			case 'd':
 			case 'i':
+				num = va_arg(args, int);
 				break;
 			defaut:
 				continue;
 		}
 
-		num = va_arg(args, int);
 		number(num, s, base, width, precision, flags);
 
 		s = str;

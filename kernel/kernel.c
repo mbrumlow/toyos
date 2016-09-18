@@ -4,12 +4,17 @@
 #include <kernel/screen.h>
 #include <kernel/serial.h>
 
-void main(unsigned int kstart, unsigned int kend) {
+#include <kernel/page.h>
+
+void main(void *kstart, void *kend, void *page_directory ) {
 
 	init_serial();
 	clear_screen();
 
-	kprintf("kstart: 0x%08x, kend: 0x%08x, size: %d\n", kstart, kend, kend - kstart);
+	kprintf("kstart: 0x%p, kend: 0x%p, pd: 0x%p\n", kstart, kend, page_directory);
+
+	init_paging(page_directory);
+
 
 	while(1);
 }
