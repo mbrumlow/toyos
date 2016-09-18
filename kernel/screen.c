@@ -60,9 +60,12 @@ void print_at(char *message, int col, int row)  {
 	}
 }
 
-void printk(char c) {
-	print_char_serial(c);
-	print_char(c, -1, -1, WHITE_ON_BLACK);
+void printk(char *s){
+	while(*s) {
+		print_char_serial(*s);
+		print_char(*s, -1, -1, WHITE_ON_BLACK);
+		s++;
+	}
 }
 
 int get_cursor() {

@@ -6,15 +6,19 @@ int strlen(char *s) {
 	return i;
 }
 
-void reverse(char *s) {
-	char t;
-	char *e = s + strlen(s) - 1;
-	while( s < e ) {
-		t = *s;
-		*(s++) = *e;
-		*(e--) = t;
-	}
+int strnlen(char *s, int n) {
+	int i = 0;
+	while(*(s++) && n--)
+		i++;
+	return i;
 }
+
+int isnumber(const char c) {
+	if( c >= '0' && c <= '9' )
+		return 1;
+	return 0;
+}
+
 
 void *memcpy(void *dest, void *src, int n) {
 	unsigned char *d = (unsigned char *) dest;

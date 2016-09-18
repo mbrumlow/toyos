@@ -5,6 +5,6 @@
 # define WHITE_ON_BLACK 0x0f
 
 void clear_screen();
-void printk(char c);
+void printk(char *s);
 
 #endif // __SCREEN_H__

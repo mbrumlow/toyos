@@ -15,7 +15,6 @@ void main(void *kstart, void *kend, void *page_directory ) {
 
 	init_paging(page_directory);
 
-
 	while(1);
 }
 
