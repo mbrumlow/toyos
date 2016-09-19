@@ -1,12 +1,7 @@
 
 #include <kernel/kernel.h>
 
-static unsigned int * page_directory = 0;
-
-void init_paging(void *pd)  {
-	page_directory = pd;
-}
-
+/*
 void *get_physaddr(void *virtaddr) {
 
 	if(!page_directory)
@@ -27,5 +22,4 @@ void *get_physaddr(void *virtaddr) {
 
 	return (void *) ((*pt & ~0xFFF) + ((unsigned long)virtaddr & 0xFFF));
 }
-
-
+*/
