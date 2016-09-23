@@ -1,20 +1,14 @@
 [org 0x7c00]
 
-KERNEL_OFFSET equ 0x2000               ; Offset to load kernel from.
+STAGE1_OFFSET equ 0x1000               ; Offset to load kernel from.
+KERNEL_OFFSET equ 0x8000               ; Offset to load kernel from.
 
   mov [BOOT_DRIVE], dl                 ; Sve boot drive from BIOS.
 
   mov bp, 0x1000                       ; Setup the stack.
   mov sp, bp
 
-  call init_screen                     ; Clear the screen an indicate we we
-
-  mov bx, MSG_REAL_MODE                ; are in real mode.
-  call print_boot_status
-
-  mov bx, MSG_PROT_MODE                ; are in real mode.
-  call print_boot_status
-
+  call load_stage1                     ; Load kernel into memory.
   call load_kernel                     ; Load kernel into memory.
 
   call switch_to_pm                    ; Switch to protected mode, no return.
@@ -30,14 +24,23 @@ KERNEL_OFFSET equ 0x2000               ; Offset to load kernel from.
 
 [bits 16]
 
-load_kernel:
+load_stage1:
 
-  mov bx, MSG_LOAD_KERNEL
-  call print_boot_status
+  mov bx, STAGE1_OFFSET
+  mov dh, STAGE1_SECTORS
+  mov dl, [BOOT_DRIVE]
+  mov cl, 0x02
+  call disk_load
+
+  ret
+
+load_kernel:
 
   mov bx, KERNEL_OFFSET
   mov dh, KERNEL_SECTORS
   mov dl, [BOOT_DRIVE]
+  mov cl, STAGE1_SECTORS
+  add cl, 0x02
   call disk_load
 
   ret
@@ -48,9 +51,10 @@ BEGIN_PM:
   mov ebx, MSG_PROT_MODE
   call print_string_pm
 
-  mov edx, KERNEL_OFFSET
-  call KERNEL_OFFSET
+  mov eax, KERNEL_SECTORS
 
+  call STAGE1_OFFSET
+  call 0x4000000
   jmp $
 
 ; Global variables

@@ -1,8 +1,8 @@
 
-#include <kernel/screen.h>
-#include <kernel/string.h>
-#include <kernel/port.h>
-#include <kernel/serial.h>
+#include <screen.h>
+#include <string.h>
+#include <port.h>
+#include <serial.h>
 
 # define VIDEO_ADDRESS 0xb8000
 # define MAX_ROWS 25

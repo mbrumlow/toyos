@@ -28,7 +28,7 @@ init_pm:
   mov gs, ax
 
   mov ebp, 0x1000       ; Update our stack pointer so it is at the top of the
-  mov esp, ebp           ; free spaec.
+  mov esp, ebp          ; free spaec.
 
   call BEGIN_PM
 

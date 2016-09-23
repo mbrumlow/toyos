@@ -8,26 +8,27 @@ all: os-image
 run: all
 	qemu-system-i386 -m size=6411K -serial stdio -cpu 486 os-image 
 
-os-image : boot/boot_sect.bin kernel.bin
+os-image : boot/boot_sect.bin stage1/stage1.bin kernel/kernel.bin
 	cat $^ > os-image
 	truncate -s +512 os-image
 
-kernel.bin: kernel/kernel_entry.o ${OBJ}
-	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
-	ld -m elf_i386 -o $@_elf -T linker.ld  $^
+stage1/stage1.bin: 
+	make -C stage1 
+	chmod +x ./scripts/pad.sh 
+	./scripts/pad.sh $@
 
-boot/boot_sect.bin: kernel.bin
+kernel/kernel.bin:
+	make -C kernel 
+	chmod +x ./scripts/pad.sh 
+	./scripts/pad.sh $@
+
+boot/boot_sect.bin: stage1/stage1.bin kernel/kernel.bin
 	chmod +x ./scripts/blocks.sh
-	nasm boot/boot_sect.asm -f bin -dKERNEL_SECTORS=`./scripts/blocks.sh kernel.bin` -o $@
-
-%.o: %.c ${HEADERS}
-	gcc -m32 -ffreestanding -I . -c $< -o $@
-
-%.o: %.asm
-	nasm $< -f elf32 -o $@
+	nasm boot/boot_sect.asm -f bin -dSTAGE1_SECTORS=`./scripts/blocks.sh stage1/stage1.bin` -dKERNEL_SECTORS=`./scripts/blocks.sh kernel/kernel.bin` -o $@
 
 clean: 
-	rm -f *.bin_elf
-	rm -f *.bin *.dis *.o os-image
-	rm -f kernel/*.o boot/*.bin drivers/*.o
+	rm -f *.bin os-image
+	rm -f boot/boot_sect.bin
+	make -C stage1 clean
+	make -C kernel clean
 

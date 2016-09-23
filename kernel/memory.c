@@ -1,5 +1,5 @@
 
-#include <kernel/kernel.h>
+#include <kernel.h>
 
 #define LAST_ENTRY(n) (n && !(((unsigned int)(n + sizeof(void *))) & 0x00000FFF))
 #define FIRST_ENTRY(n) (n && ((unsigned int)n & 0x00000FFF) == 0 )

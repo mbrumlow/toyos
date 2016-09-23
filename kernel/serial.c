@@ -1,6 +1,6 @@
 
-#include <kernel/serial.h>
-#include <kernel/port.h>
+#include <serial.h>
+#include <port.h>
 
 #define REG_SERIAL_PORT 0x3f8
 

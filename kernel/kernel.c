@@ -1,19 +1,15 @@
 
-#include <kernel/string.h>
-#include <kernel/print.h>
-#include <kernel/screen.h>
-#include <kernel/serial.h>
+#include <string.h>
+#include <print.h>
+#include <screen.h>
+#include <serial.h>
 
-#include <kernel/memory.h>
-
-void main(void *start, void *end, void *page_directory ) {
+void main(unsigned int top) {
 
 	init_serial();
 	clear_screen();
 
-	init_memory(end);
-
-	kprintf("start: 0x%p, end: 0x%p\n", start, end);
+	kprintf("TOP: %d\n", top);
 
 	while(1);
 }

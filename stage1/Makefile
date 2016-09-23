@@ -3,9 +3,9 @@ C_SOURCES = $(wildcard *.c )
 HEADERS = $(wildcard *.h )
 OBJ = ${C_SOURCES:.c=.o}
 
-all: kernel.bin
+all: stage1.bin
 
-kernel.bin: kernel_entry.o ${OBJ}
+stage1.bin: stage1_entry.o ${OBJ}
 	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
 
 %.o: %.c ${HEADERS}
@@ -17,3 +17,4 @@ kernel.bin: kernel_entry.o ${OBJ}
 clean: 
 	rm -f *.o
 	rm -f *.bin
+

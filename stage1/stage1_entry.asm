@@ -1,13 +1,15 @@
 [bits 32]
 
 [global start]
-[extern end]
 [extern main]
 
 start:
 
+push ebp
+mov ebp, esp
 push eax
 call main
-
-jmp $
+add esp, 4
+pop ebp
+ret
 

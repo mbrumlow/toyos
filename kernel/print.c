@@ -1,8 +1,8 @@
 
-#include <kernel/kernel.h>
-#include <kernel/string.h>
-#include <kernel/print.h>
-#include <kernel/screen.h>
+#include <kernel.h>
+#include <string.h>
+#include <print.h>
+#include <screen.h>
 
 #define ZEROPAD 1
 #define SIGN    2
