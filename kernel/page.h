@@ -3,8 +3,8 @@
 
 #define PAGE_SIZE 4096
 
-void init_paging(void *start, void *end);
-
-//void *get_physaddr(void *virtaddr);
+void init_paging(void *top);
+int mapped(void *virtaddr);
+void kmap(void *physaddr, void *virtaddr);
 
 #endif //__PAGE_H__

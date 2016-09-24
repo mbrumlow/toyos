@@ -7,8 +7,8 @@
 static void *top = 0;
 static unsigned int *next = 0;
 
-void init_memory(void *end) {
-	top = end;
+void init_memory(void *_top) {
+	top = _top;
 }
 
 void *new_frame()  {
