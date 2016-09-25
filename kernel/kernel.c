@@ -21,6 +21,7 @@ void main(void *top) {
 		kprintf("Allocated int @ %p\n", i);
 		*i = 123;
 		kprintf("Stored 123 in *int @ %p -> %d\n", i, *i);
+		kfree(i);
 	}
 
 	while(1);

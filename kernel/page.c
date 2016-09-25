@@ -10,6 +10,7 @@ static unsigned int *_page_directory = 0;
 static unsigned int _end = (unsigned int) &end;
 
 void map_page(unsigned int *page_directory, void *physaddr, void *virtaddr, unsigned int flags);
+void unmap_page(unsigned int *page_directory, void *virtaddr);
 void *get_physaddr(unsigned int *page_directory, void *virtaddr);
 
 void init_paging(void *top) {
@@ -63,9 +64,22 @@ int mapped(void *virtaddr) {
 
 void kmap(void *physaddr, void *virtaddr) {
 	map_page(_page_directory, physaddr, virtaddr, 0x02);
-	return;
 }
 
+void kunmap(void *virtaddr) {
+	unmap_page(_page_directory, virtaddr);
+}
+
+void unmap_page(unsigned int *page_directory, void *virtaddr ) {
+
+	unsigned int pdindex = (unsigned int)virtaddr >> 22;
+	unsigned int ptindex = (unsigned int)virtaddr >> 12 & 0x03FF;
+
+	unsigned int *pd = (unsigned int *) (page_directory + pdindex);
+	unsigned int *pt = ((unsigned int *) (*pd & 0xFFFFF000)) + ptindex;
+
+	*pt = 0;
+}
 
 void map_page(unsigned int *page_directory, void *physaddr, void *virtaddr, unsigned int flags) {
 

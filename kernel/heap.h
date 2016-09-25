@@ -3,6 +3,6 @@
 
 void init_heap();
 void *kmalloc(int size);
-void kfreee(void *ptr);
+void kfree(void *ptr);
 
 #endif // __HEAP_H__
