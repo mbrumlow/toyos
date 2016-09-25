@@ -3,7 +3,7 @@
 #include <page.h>
 #include <print.h>
 
-#define MAX_ALLOC 22
+#define MAX_ALLOC 32
 
 extern void *end;
 static void *heap_top = (void *) (&end + 0x1000);
@@ -15,7 +15,7 @@ typedef struct __attribute__((__packed__)) {
 	unsigned char size;
 } alloc_header;
 
-static alloc_header *slab[32];
+static alloc_header *slab[MAX_ALLOC];
 
 void init_heap() {
 	for(int i=0; i < MAX_ALLOC; i++) {
@@ -23,41 +23,42 @@ void init_heap() {
 	}
 }
 
+unsigned int bsf(unsigned int n) {
+	unsigned int result;
+	__asm__("bsf %%dx, %%ax" : "=a" (result) : "d" (n));
+	return result;
+}
+
+unsigned int nextPower2(unsigned int n)  {
+
+	n--;
+	n |= n >> 1;
+	n |= n >> 2;
+	n |= n >> 4;
+	n |= n >> 8;
+	n |= n >> 16;
+	n++;
+
+	return n;
+}
+
+
 void *kmalloc(int size) {
 
 	alloc_header *ah;
 	void *ptr, *heap;
-	int i, idx = 0;
-	int sz;
+	int sz = nextPower2(size);
+	int idx = bsf(sz);
 
-	for(i = 1; i < MAX_ALLOC; i++) {
+	kprintf("kmalloc: size: %d\n", size);
 
-		sz = 4 << i-1;
-
-		if(sz < size)
-			continue;
-
-		idx = i;
-		size = sz;
-
-		for(; i < MAX_ALLOC; i++) {
-
-			if(slab[i-1]) {
-
-				if(size == sz) {
-					ah = slab[i-1];
-					slab[i-1] = ah->next;
-					ptr = ah + sizeof(alloc_header);
-					ah->size = ah->size & ~0x80;
-					return ptr;
-				} else {
-					// TODO: consider breaking up larger entries.
-				}
-
-			}
-		}
-
-		break;
+	if(slab[idx]) {
+		ah = slab[idx];
+		slab[idx] = ah->next;
+		ptr = ++ah;
+		ah->size = ah->size & ~0x80;
+		kprintf("kmalloc: found cache entry %p/%p\n", ah, ptr);
+		return ptr;
 	}
 
 	if(!mapped(heap_top)) {
@@ -65,9 +66,11 @@ void *kmalloc(int size) {
 		kmap(frame, heap_top);
 	}
 
+	// allocate the pages required to satisfy this heap.
 	heap = (void *) ((unsigned int) heap_top & 0xFFFFF000) + 0x1000;
-	while(size + sizeof(unsigned int) + sizeof(unsigned char) > heap - heap_top) {
+	while(size + sizeof(ah) > heap - heap_top) {
 		void *frame = alloc_frame();
+		// TODO check for failure (alloc_frame() does not support this yet).
 		kmap(frame, heap);
 		heap += 0x1000;
 	}
@@ -85,7 +88,6 @@ void *kmalloc(int size) {
 
 	heap_top += size;
 	return ptr;
-
 }
 
 void remove_slab(int idx, alloc_header *ah) {
@@ -154,17 +156,23 @@ void add_slab(int idx, alloc_header *ah) {
 void kfree(void *ptr) {
 
 	alloc_header *ah = ptr - sizeof(alloc_header);
-	unsigned int idx = ((unsigned int) ah->size & 0x0000007F)-1;
-	unsigned int size = 4 << idx;
-	unsigned int start = (unsigned int) ptr - sizeof(alloc_header);
-	unsigned int end = (((unsigned int )ptr + size) & 0xFFFFF000);
+	unsigned int idx = ((unsigned int)ah->size) & 0x0000007F;
+	unsigned int size = 1 << idx;
+	unsigned int start = ((unsigned int) ptr) - sizeof(alloc_header);
+	unsigned int end = ((unsigned int )ptr + size) & 0xFFFFF000;
+
+	kprintf("kfree: ptr: %p, size: %d => %p | heap_top: %p\n",
+			ptr, size, ptr + size, heap_top);
 
 	while(ptr + size == heap_top) {
+
+		kprintf("kfree: recovering heap %p -> %p\n", heap_top, (void *) start);
 
 		heap_top = (void *) start;
 		prev = ah->prev;
 
 		if( start == (start & 0xFFFFF000) ) {
+			kprintf("kfree: recovering last page: %p\n", (void *) start);
 			kunmap((void *) start);
 			put_frame((void *) start);
 		} else {
@@ -173,6 +181,7 @@ void kfree(void *ptr) {
 
 		start += 0x1000;
 		while(start <= end) {
+			kprintf("kfree: recovering another page: %p\n", (void *) start);
 			kunmap((void *) start);
 			put_frame((void *) start);
 			start += 0x1000;
@@ -182,6 +191,8 @@ void kfree(void *ptr) {
 		if(!prev)
 			return;
 
+		kprintf("kfree: checking for more slabs to free @ %p\n", prev);
+
 		// prep everything for top of loop based off prev.
 		ptr = prev;
 		ah = ptr - sizeof(alloc_header);
@@ -189,12 +200,17 @@ void kfree(void *ptr) {
 		end = (((unsigned int )ptr + size) & 0xFFFFF000);
 
 		if(ah->size & 0x80) {
+			kprintf("kfree: found slab to free @ %p\n", prev);
 			remove_slab(idx, ah);
 			continue;
 		}
 
+		kprintf("kfree: all done!\n");
+
 		return;
 	}
+
+	kprintf("kfree: caching slab %p/%p, size: %d\n", ah,ptr, size);
 
 	ah->size = ah->size | 0x80;
 	add_slab(idx, ah);

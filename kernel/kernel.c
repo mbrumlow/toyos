@@ -24,6 +24,24 @@ void main(void *top) {
 		kfree(i);
 	}
 
+	int *i1, *i2, *i3, *i4;
+
+	i1 = kmalloc(sizeof(int));
+	i2 = kmalloc(sizeof(int));
+	i3 = kmalloc(sizeof(int));
+	i4 = kmalloc(sizeof(int));
+
+
+	kfree(i3);
+	kfree(i2);
+	kfree(i1);
+
+	i1 = kmalloc(sizeof(int));
+
+	kfree(i1);
+	kfree(i4);
+
+
 	while(1);
 }
 
