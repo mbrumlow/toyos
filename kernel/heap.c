@@ -98,7 +98,6 @@ void remove_slab(int idx, alloc_header *ah) {
 	}
 
 	if(slab[idx] == ah) {
-		kprintf("Removing from slab head!\n");
 		slab[idx] = ah->next;
 		return;
 	}
@@ -108,7 +107,6 @@ void remove_slab(int idx, alloc_header *ah) {
 
 	while(n) {
 		if(n == ah) {
-			kprintf("Removing from slab!\n");
 			p->next = n->next;
 			return;
 		}
